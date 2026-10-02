@@ -198,9 +198,11 @@ def daftarkan(app, ambil_pengguna, tpl):
         }
 
         try:
+            # 'Kaito Novel' disembunyikan dari panel (permintaan user 2 Okt).
             sumber = [dict(r) for r in _qnaver(
                 "SELECT coalesce(sumber_web,'(kosong)') s, count(*) c "
-                "FROM novel GROUP BY s ORDER BY c DESC LIMIT 8")]
+                "FROM novel WHERE coalesce(sumber_web,'') NOT LIKE 'Kaito%' "
+                "GROUP BY s ORDER BY c DESC LIMIT 8")]
         except Exception:
             sumber = []
 
