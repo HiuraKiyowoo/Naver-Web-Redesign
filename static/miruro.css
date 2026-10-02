@@ -1338,7 +1338,7 @@ a.hal-angka-item:hover{ background:rgba(4,157,253,.16); color:#DFF0FF; }
 
 
 /* ══ FOOTER TERPUSAT — Novel Translation Archive ══ */
-.kaki{ margin-top:64px; padding:42px 0 0; border-top:1px solid var(--garis); text-align:center; }
+.kaki{ position:relative; z-index:2; margin-top:64px; padding:42px 0 0; border-top:1px solid var(--garis); text-align:center; }
 .kaki-dalam{ display:block; padding-bottom:30px; }
 .kaki-merek{ display:flex; align-items:center; flex-direction:column; gap:11px; }
 .kaki-logo{ margin:0; }
