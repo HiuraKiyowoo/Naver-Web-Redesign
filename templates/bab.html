@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block judul %}{{ judul }}{% endblock %}
+
+
+{% block isi %}
+
+{# ── bilah atas gaya Miruro: ← · judul · ⋯ ── #}
+<div class="baca-bilah">
+  <div class="baca-bilah-dalam">
+    <a href="/novel/{{ n.slug }}" aria-label="Kembali">←</a>
+    <div class="baca-judul">
+      <b>{{ n.judul }}</b>
+      <span>Bab {{ b.nomor or b.urutan }}{% if b.judul %} · {{ b.judul }}{% endif %}</span>
+    </div>
+    <a href="#daftar-bab" aria-label="Daftar bab">☰</a>
+  </div>
+</div>
+
+<div class="baca{% if gerbang_dasar %} baca-terkunci{% endif %}">
+
+  <h1>{{ b.judul or ('Bab ' ~ (b.nomor or b.urutan)) }}</h1>
+  <div class="baca-meta">
+    {{ n.judul }}{% if b.tanggal %} · {{ b.tanggal[:10] }}{% endif %}
+  </div>
+
+  {# ── ilustrasi pembuka ── #}
+  {% for g in gambar %}{% if g.urutan <= 2 and not gerbang_dasar %}
+  <figure class="baca-illust">
+    <img src="{{ g.sumber }}" alt="{{ g.caption or 'Ilustrasi' }}" loading="lazy" onerror="this.closest('figure').style.display='none'">
+    {% if g.caption %}<figcaption style="font-size:11px;color:rgba(255,255,255,.4);padding:10px 14px">{{ g.caption }}</figcaption>{% endif %}
+  </figure>
+  {% endif %}{% endfor %}
+
+  {# ── isi bab ── #}
+  {% if ada_teks or paragraf %}
+  <div class="baca-isi">
+    {% for p in paragraf %}{% if p.strip() %}<p>{{ p }}</p>{% endif %}{% endfor %}
+  </div>
+  {% else %}
+  <div class="kosong">
+    <b>Bab ini tidak ada teksnya</b>
+    <span>Mungkin isinya hanya ilustrasi. Lihat di bawah.</span>
+  </div>
+  {% endif %}
+
+  {# ── ilustrasi sisanya ── #}
+  {% for g in gambar %}{% if g.urutan > 2 and not gerbang_dasar %}
+  <figure class="baca-illust">
+    <img src="{{ g.sumber }}" alt="{{ g.caption or 'Ilustrasi' }}" loading="lazy" onerror="this.closest('figure').style.display='none'">
+    {% if g.caption %}<figcaption style="font-size:11px;color:rgba(255,255,255,.4);padding:10px 14px">{{ g.caption }}</figcaption>{% endif %}
+  </figure>
+  {% endif %}{% endfor %}
+
+  {# ══ AJAKAN LOGIN — menyatu di halaman, di bawah isi bab ══ #}
+  {% if gerbang_dasar %}
+  <div class="kunci">
+    <span class="kunci-ikon" aria-hidden="true">{% include "_gembok.html" %}</span>
+    <h3>Lanjut baca perlu akun</h3>
+    <p>Di tiap novel <b>bab 1–{{ batas_bab }} bebas</b> — mau dibaca berapa kali pun.
+       <b>Bab {{ batas_bab + 1 }}</b> ke atas perlu masuk, jadi bab ini disamarkan.</p>
+    <div class="kunci-tombol">
+      <a class="tombol tombol-utama" href="/masuk?lanjut={{ (kanon | urlencode) }}">Masuk / Daftar</a>
+      <a class="tombol tombol-abu" href="/novel/{{ n.slug }}">Kembali</a>
+    </div>
+    {% if bab_awal %}
+    <div class="kunci-pil">
+      <span>Masih bebas:</span>
+      {% for x in bab_awal %}<a href="/novel/{{ n.slug }}/bab/{{ x.urutan }}">Bab {{ x.urutan }}</a>{% endfor %}
+      <a href="/novel/{{ n.slug }}">Semua bab</a>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# ── navigasi (disembunyikan saat terkunci) ── #}
+  {% if not gerbang_dasar %}
+  <div class="baca-navigasi">
+    {% if sebelum %}
+    <a href="/novel/{{ n.slug }}/bab/{{ sebelum }}">← Sebelumnya</a>
+    {% endif %}
+    <a href="/novel/{{ n.slug }}">Daftar Bab</a>
+    {% if sesudah %}
+{% if (not pengguna) and (sesudah > batas_bab) %}<a class="nav-terkunci" href="/novel/{{ n.slug }}/bab/{{ sesudah }}"><span class="gkunci" title="Perlu masuk">{% include "_gembok.html" %}</span> Bab Berikutnya</a>{% else %}<a href="/novel/{{ n.slug }}/bab/{{ sesudah }}">Berikutnya →</a>{% endif %}
+{% endif %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

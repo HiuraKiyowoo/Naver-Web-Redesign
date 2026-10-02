@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block judul %}Wajib Masuk · {{ n.judul }}{% endblock %}
+
+{% block isi %}
+<div class="wadah">
+  <div class="gerbang">
+    <div class="gerbang-ikon" aria-hidden="true">{% include "_gembok.html" %}</div>
+    <h2>Bab 1–{{ batas }} bebas · Bab {{ batas + 1 }} ke atas perlu masuk</h2>
+    <p>
+      Di setiap novel, <b>bab 1–{{ batas }} bebas dibaca tanpa akun</b> — mau dibaca berapa kali pun.<br>
+      <b>Bab {{ batas + 1 }}</b> ke atas perlu akun. Untuk lanjut ke <b>Bab {{ urutan }}</b> di <b>{{ n.judul }}</b>, masuk dulu ya.
+    </p>
+
+    <div class="gerbang-aksi">
+      <a class="tombol tombol-utama" href="/masuk?lanjut={{ (kanon | urlencode) }}">Masuk / Daftar</a>
+      <a class="tombol tombol-abu" href="/novel/{{ slug }}">Kembali ke detail</a>
+    </div>
+
+    {% if bab_awal %}
+    <div class="gerbang-petunjuk">
+      Yang masih bisa dibaca tanpa akun di novel ini:
+      {% for b in bab_awal %}<a href="/novel/{{ slug }}/bab/{{ b.urutan }}">Bab {{ b.urutan }}</a>{% if not loop.last %} · {% endif %}{% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

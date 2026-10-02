@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block judul %}{{ judul }}{% endblock %}
+
+{% block isi %}
+<div class="wadah">
+  <div class="kepala-halaman">
+    <h1>Profil</h1>
+    <span>Akun &amp; pengaturan</span>
+  </div>
+
+  {% if pengguna %}
+  {# ── SUDAH MASUK ── #}
+  <div class="akun-kartu">
+    {% if pengguna.foto %}
+    <img class="akun-foto" src="{{ pengguna.foto }}" alt="" referrerpolicy="no-referrer">
+    {% else %}
+    <span class="akun-foto akun-foto-abu">{{ (pengguna.nama or pengguna.email or 'P')[:1]|upper }}</span>
+    {% endif %}
+    <div class="akun-teks">
+      <b>{{ pengguna.nama or 'Pembaca' }}</b>
+      <span>{{ pengguna.email or '—' }}</span>
+      <span class="akun-lencana">Masuk sebagai {{ pengguna.penyedia or 'firebase' }}</span>
+    </div>
+  </div>
+
+  <div class="akun-statistik">
+    <a class="akun-stat" href="/pustaka">
+      <b>{{ jml_fav }}</b><span>Favorit</span>
+    </a>
+    <a class="akun-stat" href="/pustaka">
+      <b>—</b><span>Riwayat baca</span>
+    </a>
+    <a class="akun-stat" href="/pustaka">
+      <b>—</b><span>Lanjut baca</span>
+    </a>
+  </div>
+
+  <div class="akun-aksi">
+    <a class="tombol tombol-utama" href="/pustaka">Buka Pustaka</a>
+    <a class="tombol tombol-abu" href="/keluar">Keluar</a>
+  </div>
+
+  {% else %}
+  {# ── BELUM MASUK ── #}
+  <div class="akun-kartu akun-kartu-tamu">
+    <span class="akun-foto akun-foto-abu">?</span>
+    <div class="akun-teks">
+      <b>Belum masuk</b>
+      <span>Masuk supaya favorit, riwayat baca, dan posisi bab tersimpan.</span>
+    </div>
+  </div>
+
+  <div class="akun-aksi">
+    <a class="tombol tombol-utama" href="/masuk">Masuk / Daftar</a>
+    <a class="tombol tombol-abu" href="/">Ke Beranda</a>
+  </div>
+
+  {% if not fb_siap %}
+  <div class="akun-catatan">⚠️ Sistem masuk belum aktif di server ini.</div>
+  {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

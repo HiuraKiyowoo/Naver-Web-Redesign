@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block judul %}{{ judul }}{% endblock %}
+
+{% block isi %}
+<div class="wadah">
+  <div class="kepala-halaman">
+    <h1>Status Arsip</h1>
+    <span>Isi arsip apa adanya — dihitung langsung dari basis data</span>
+  </div>
+
+  {# ── angka utama ── #}
+  <div class="stat-petak">
+    <div class="stat-kotak stat-utama">
+      <b>{{ '{:,}'.format(s.novel).replace(',', '.') }}</b>
+      <span>Novel</span>
+    </div>
+    <div class="stat-kotak stat-utama">
+      <b>{{ '{:,}'.format(s.bab).replace(',', '.') }}</b>
+      <span>Bab</span>
+    </div>
+    <div class="stat-kotak stat-utama">
+      <b>{{ '{:,}'.format(s.gambar).replace(',', '.') }}</b>
+      <span>Ilustrasi</span>
+    </div>
+  </div>
+
+  {# ── rincian ── #}
+  <div class="panel stat-rinci">
+    <h2 class="stat-judul">Rincian</h2>
+    <div class="stat-baris"><span>Total huruf isi bab</span><b>{{ '{:,}'.format(s.huruf or 0).replace(',', '.') }}</b></div>
+    <div class="stat-baris"><span>Novel punya ilustrasi</span><b>{{ s.ilustrasi }}</b></div>
+    <div class="stat-baris"><span>Novel bersampul</span><b>{{ s.bersampul }}</b></div>
+    <div class="stat-baris"><span>Masih jalan</span><b>{{ s.masih_jalan }}</b></div>
+    <div class="stat-baris"><span>Sudah tamat</span><b>{{ s.sudah_tamat }}</b></div>
+    <div class="stat-baris"><span>Genre</span><b>{{ s.genre }}</b></div>
+    <div class="stat-baris"><span>Tag</span><b>{{ s.tag }}</b></div>
+    <div class="stat-baris"><span>Permintaan dari pengguna</span><b>{{ req_jml }}</b></div>
+    {% if akhir %}
+    <div class="stat-baris"><span>Pembaruan bab terakhir</span><b>{{ akhir }}</b></div>
+    {% endif %}
+  </div>
+
+  {# ── novel terpanjang ── #}
+  {% if teratas %}
+  <div class="pustaka-bagian">
+    <h2 class="stat-judul">Terbanyak babnya</h2>
+    <div class="stat-daftar">
+      {% for n in teratas %}
+      <a class="stat-item" href="/novel/{{ n.slug }}">
+        <span class="stat-item-judul">{{ n.judul }}</span>
+        <span class="stat-item-angka">{{ n.jumlah_bab }} bab</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {# ── permintaan terbaru ── #}
+  {% if req %}
+  <div class="pustaka-bagian">
+    <h2 class="stat-judul">Request terbaru</h2>
+    <div class="req-daftar">
+      {% for r in req %}
+      <div class="req-baris">
+        <div class="req-baris-utama">
+          <b>{{ r.judul }}</b>
+          <span class="redup">{{ (r.waktu or '')[:16] }}</span>
+        </div>
+        <span class="req-status req-status-{{ r.status }}">{{ r.status }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    <p class="redup" style="margin-top:12px">
+      <a href="/request">Kirim request novel baru →</a>
+    </p>
+  </div>
+  {% endif %}
+
+  <p class="redup stat-catatan">
+    Angka di halaman ini dihitung dari basis data arsip setiap kali dibuka —
+    jadi selalu sesuai keadaan sebenarnya.
+  </p>
+</div>
+{% endblock %}

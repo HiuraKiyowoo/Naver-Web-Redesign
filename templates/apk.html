@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block isi %}
+
+<div class="wadah" style="padding-top:110px">
+  <div class="judul-hal" style="padding:0">
+    <div>
+      <h1>Naver <span style="color:var(--cyan)">Novel</span></h1>
+      <p>Baca novel terjemahan langsung dari HP, lebih ringan, ada unduhan bab.</p>
+    </div>
+  </div>
+
+  <div class="detail-aksi" style="margin:22px 0 40px">
+    <a class="tombol tombol-utama" href="{{ apk_url or '#' }}">Unduh APK</a>
+    <a class="tombol tombol-abu" href="/">Buka Web</a>
+  </div>
+
+  <section class="bagian">
+    <div class="bagian-kepala">
+      <div class="bagian-kiri"><h2>Fitur</h2><span class="bagian-sub">Yang ada di aplikasi</span></div>
+    </div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr))">
+      {% for f in [('Arsip Sendiri', (total_novel|default(0))|string + ' novel · ' + (total_bab|default(0))|string + ' bab, bebas dibaca.'),
+                   ('Ilustrasi Lengkap', 'Gambar bab ikut tersimpan.'),
+                   ('Pencarian Isi Bab', 'Cari kata di dalam semua bab.'),
+                   ('Tema Gelap', 'Nyaman dibaca malam hari.')] %}
+      <div class="panel" style="margin:0">
+        <h3 style="margin:0 0 8px;font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:.06em">{{ f[0] }}</h3>
+        <p class="redup" style="margin:0;font-size:12px;line-height:1.7">{{ f[1] }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+
+{% endblock %}

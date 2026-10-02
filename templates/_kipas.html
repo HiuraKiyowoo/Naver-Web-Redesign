@@ -1,0 +1,21 @@
+{# KIPAS / FAN — khusus section "Jelajahi Acak".
+   Butuh: acak (daftar novel), tipe_lencana(n) -> 'LN' / 'WN' / ''.
+   ⚠️ sudut/geser/z SUDAH DIHITUNG di main.py (bukan di Jinja — pelajaran 29 Sep).
+        transform: translateY(|i-1.5|*7px) rotate((i-1.5)*7deg)
+     5 kartu → i = -2,-1,0,1,2 → rotasi -14°,-7°,0°,7°,14° (simetris di tengah) #}
+<div class="fan">
+  {% for n in acak[:5] %}
+  <a class="fi" href="{{ n.url }}"
+     style="--i:{{ n.i }}; z-index:{{ n.z }}; --r:{{ n.sudut }}deg; --ty:{{ n.geser }}px; transform:translateY({{ n.geser }}px) rotate({{ n.sudut }}deg)">
+    {% if n.cover %}
+      <img src="{{ n.cover }}" alt="Cover {{ n.judul }}" loading="lazy">
+    {% else %}
+      <div class="tanpa-cover" style="aspect-ratio:4/5;border-radius:8px;background:var(--panel)">{{ n.judul[:1] }}</div>
+    {% endif %}
+    {% set lc = tipe_lencana(n) %}
+    {% if lc %}
+    <span class="bd"><em class="{{ lc }}">{{ lc }}</em></span>
+    {% endif %}
+  </a>
+  {% endfor %}
+</div>

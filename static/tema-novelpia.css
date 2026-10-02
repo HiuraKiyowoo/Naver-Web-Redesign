@@ -1,0 +1,209 @@
+/* ══════════════════════════════════════════════════════════════
+   web-novelpia.css — lapisan gaya MENIRU global.novelpia.com
+   Dipasang SETELAH web.css (menimpa tampilan beranda + kartu).
+   Angka dari CSS asli novelpia (desain/novelpia/asli/*.css):
+     kisi   : repeat(6,calc(16.66667% - 19.83333px)); grid-gap:24px
+     cover  : aspect-ratio 1/1.5 (2:3); border-radius 5px
+     overlay: linear-gradient(180deg,#91919100,#000000e6 56.5%)
+     section: 32px weight 600 · MORE 18px #747474
+   Palet asli: #f34630 #6a00ff #7632ff #2c78ff #004cd0 #ff5067 #ff697d
+               #747474 #919191 #a2a2a2 #171717 #d1deff #ffffff
+   ⚠️ novelpia LATARNYA TERANG. Class lama dipertahankan supaya halaman
+      lain (jelajah/cari/detail/baca) tidak rusak.
+   ══════════════════════════════════════════════════════════════ */
+
+:root{
+  --np-teks:#171717; --np-redup:#747474;
+  --np-merah:#f34630; --np-ungu:#6a00ff; --np-ungu2:#7632ff;
+  --np-biru:#2c78ff; --np-biru2:#004cd0; --np-pink:#ff5067;
+  --np-garis:#ececec; --np-radius:5px;
+}
+
+/* font lokal (salinan dari desain/font) — novelpia memakai Noto Sans.
+   Huruf Hangul & Kanji ikut dipasang karena 247/495 novel kita berhuruf KR/JP. */
+@font-face{font-family:'Noto Sans';src:url('/static/font/NotoSans.ttf') format('truetype');
+  font-weight:100 900;font-display:swap}
+@font-face{font-family:'Noto Sans KR';src:url('/static/font/NotoSansKR.ttf') format('truetype');
+  font-weight:100 900;font-display:swap;
+  unicode-range:U+AC00-D7AF,U+1100-11FF,U+3130-318F}
+@font-face{font-family:'Noto Sans JP';src:url('/static/font/NotoSansJP.ttf') format('truetype');
+  font-weight:100 900;font-display:swap;
+  unicode-range:U+3040-30FF,U+4E00-9FFF}
+
+/* ══════ HALAMAN: TERANG (novelpia) ══════ */
+body{
+  background:#fff !important;
+  color:var(--np-teks) !important;
+  font-family:'Noto Sans','Noto Sans KR','Noto Sans JP',Pretendard,
+    system-ui,-apple-system,sans-serif !important;
+}
+.kepala{background:rgba(255,255,255,.96) !important;
+  border-bottom:1px solid var(--np-garis) !important}
+.logo-teks,.logo{color:var(--np-teks) !important}
+.logo-teks span,.logo span{background:linear-gradient(90deg,var(--np-biru),var(--np-ungu));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.nav-atas a{color:#3d3d3d !important}
+.nav-atas a:hover{color:var(--np-biru) !important}
+.redup{color:var(--np-redup) !important}
+.kaki{background:#fafafa !important;border-top:1px solid var(--np-garis) !important;
+  color:var(--np-redup) !important}
+.kaki a,.kaki-tautan a{color:var(--np-redup) !important}
+.kaki a:hover{color:var(--np-biru) !important}
+
+/* ══════ SECTION (angka asli: 32px / MORE 18px) ══════ */
+.bagian{margin:44px 0 0}
+.bagian-kepala{display:flex;align-items:baseline;justify-content:space-between;
+  margin-bottom:2px;gap:16px}
+.bagian-kepala h2{font-size:32px !important;font-weight:600 !important;
+  letter-spacing:-.02em;color:var(--np-teks);line-height:1.2}
+.bagian-kepala h2::before{display:none !important}
+.bagian-kepala p{display:none}
+.lebih{color:var(--np-redup) !important;font-size:18px !important;
+  font-weight:500 !important;white-space:nowrap}
+.lebih:hover{color:var(--np-teks) !important;text-decoration:none !important}
+.detak{display:none}
+
+/* ══════ RAK: KISI 6 KOLOM (nilai asli novelpia) ══════ */
+.rak,.grid,.hasil-grid{
+  display:grid !important;
+  grid-template-columns:repeat(6,calc(16.66667% - 19.83333px)) !important;
+  grid-gap:24px !important;overflow:visible !important;
+  scroll-snap-type:none !important;margin-top:20px;padding:0 !important}
+.rak::-webkit-scrollbar{display:none}
+
+/* ══════ KARTU: cover 2:3 + judul DI ATAS cover ══════ */
+.kartu{display:block;min-width:0;width:100%;max-width:180px;
+  border:0 !important;background:none !important;border-radius:0 !important;
+  padding:0 !important;box-shadow:none !important;position:relative}
+.kartu-cover{position:relative;aspect-ratio:1/1.5 !important;width:100%;
+  border-radius:var(--np-radius) !important;overflow:hidden;
+  border:0 !important;box-shadow:none !important;background:#f0f0f0}
+.kartu-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.kartu:hover .kartu-cover img{transform:scale(1.04);transition:transform .3s}
+/* panel info DI ATAS cover (judul + tag + angka) */
+.kartu-isi{position:absolute;left:0;bottom:0;width:100%;z-index:2;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  /* ⚠️ JANGAN pakai height tetap (62%) + flex-end: judul 3 baris akan
+     mendorong isi keluar tepi bawah → tag & angka bertabrakan/terpotong
+     (terbukti di kartu baris ke-2, desktop 1440). Pakai padding-top besar
+     sebagai pengganti tinggi gradien; isi selalu tumbuh ke ATAS. */
+  padding:64px 12px 12px;
+  background:linear-gradient(180deg,#00000000 0%,#000000cc 34%,#000000f2 100%)}
+.kartu-judul{color:#fff !important;font-size:16px !important;font-weight:700 !important;
+  line-height:1.26;margin:0 0 6px !important;text-shadow:0 1px 3px rgba(0,0,0,.6);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
+  overflow:hidden;white-space:normal !important}
+.kartu-meta{color:#dcdcdc !important;font-size:11.5px !important;
+  text-shadow:0 1px 3px rgba(0,0,0,.6);margin:0}
+/* tag status (#Ongoing) di dalam kartu */
+.kartu .bab-pil,.kartu .pil{
+  /* ⚠️ WAJIB timpa `position:absolute;bottom:8px;right:8px` di web.css:205.
+     Kalau tidak, tag #Ongoing dipaksa ke kanan-bawah & bertabrakan dengan
+     baris "N pembaca · M bab" yang juga di bawah (terbukti via ukur DOM:
+     pil t779-b799 vs meta t782-b800). */
+  position:static !important;left:auto !important;right:auto !important;
+  top:auto !important;bottom:auto !important;
+  display:block !important;color:#8fd3ff !important;background:none !important;
+  border:0 !important;border-radius:0 !important;padding:0 !important;
+  font-size:13px !important;font-weight:600 !important;
+  margin:0 0 5px !important;line-height:1.35;
+  text-shadow:0 1px 3px rgba(0,0,0,.6)}
+/* lencana rating: merah, kanan-atas (tidak menabrak judul) */
+.kartu .lencana{position:absolute;top:0;right:0;left:auto;z-index:3;
+  background:var(--np-merah) !important;color:#fff !important;border:0 !important;
+  border-radius:0 var(--np-radius) 0 8px !important;font-size:11.5px !important;
+  font-weight:800 !important;padding:4px 9px 5px !important;
+  box-shadow:0 2px 8px rgba(243,70,48,.35)}
+.kartu .tanpa-cover{color:#9a9a9a;font-size:12px}
+
+/* ══════ HERO — terang, gaya novelpia ══════ */
+.hero{aspect-ratio:auto !important;min-height:0 !important;background:#fff !important;
+  border:0 !important;border-bottom:1px solid var(--np-garis) !important;
+  border-radius:0 !important;margin:0 0 8px !important;
+  padding:30px 0 34px !important;box-shadow:none !important}
+.hero::after{display:none !important}
+.hero-isi{padding:0 !important;gap:38px !important;align-items:center;
+  flex-direction:row !important}
+.hero-kiri{flex:1;min-width:0}
+.hero-label{background:linear-gradient(90deg,var(--np-biru),var(--np-ungu)) !important;
+  color:#fff !important;border:0 !important;font-size:12px !important;
+  letter-spacing:1.4px;padding:5px 12px !important;margin-bottom:14px !important}
+.hero-label i{background:#fff !important;box-shadow:none !important}
+.hero-judul{color:var(--np-teks) !important;
+  font-size:clamp(24px,3.2vw,38px) !important;font-weight:800 !important;
+  line-height:1.16 !important;-webkit-line-clamp:3 !important;margin-bottom:10px !important}
+.hero-judul em{color:var(--np-biru) !important}
+.hero-sub{color:#4a4a4a !important;font-size:14.5px !important;line-height:1.7;
+  max-width:70ch;-webkit-line-clamp:3 !important;margin-bottom:20px !important}
+.hero-stat{border-top:1px solid var(--np-garis) !important;gap:26px !important;
+  margin-top:20px !important;padding-top:16px !important}
+.hero-stat div b{color:var(--np-teks) !important;font-size:19px !important}
+.hero-stat div span{color:var(--np-redup) !important;font-size:11px !important}
+.hero-kanan{width:clamp(150px,22%,200px) !important;height:auto !important;
+  aspect-ratio:1/1.5;align-self:center;max-height:none !important}
+.tumpuk{width:auto !important;height:100% !important;border-radius:10px !important;
+  border:0 !important;box-shadow:0 12px 30px rgba(0,0,0,.16) !important}
+.hero-lencana{background:none !important;border:0 !important;color:var(--np-redup) !important}
+
+/* tombol: novelpia pakai kotak (radius 6px), bukan pil */
+.btn{border-radius:6px !important;font-weight:700 !important}
+.btn-utama{background:var(--np-teks) !important;color:#fff !important;
+  box-shadow:none !important}
+.btn-utama:hover{background:#000 !important;transform:none !important}
+.btn-sekunder{background:#fff !important;color:var(--np-teks) !important;
+  border:1px solid #ddd !important}
+.btn-sekunder:hover{border-color:var(--np-teks) !important;color:var(--np-teks) !important}
+
+/* ══════ PIL GENRE & TAG (terang) ══════ */
+.pil,.chip,.acak-pil{background:#f4f5f7 !important;border:1px solid #ebebeb !important;
+  color:#2f2f2f !important;border-radius:999px !important;font-weight:600;
+  padding:9px 16px !important;font-size:14px !important}
+.pil:hover,.chip:hover,.acak-pil:hover{background:#fff !important;
+  border-color:var(--np-biru) !important;color:var(--np-biru) !important}
+.tag-baris .tag,.tag{color:var(--np-redup) !important;background:#f4f5f7 !important;
+  border-color:#ebebeb !important}
+
+/* ══════ KOTAK AJAKAN, CARI, WADAH ══════ */
+.ajakan{background:linear-gradient(120deg,#f2f6ff,#fff) !important;
+  border:1px solid #e5edff !important}
+.ajakan h3,.ajakan b{color:var(--np-teks) !important}
+.cari-atas input,.kepala input{background:#f7f7f8 !important;
+  color:var(--np-teks) !important;border:1px solid #e2e2e2 !important;
+  border-radius:999px !important}
+.cari-atas input:focus,.kepala input:focus{background:#fff !important;
+  border-color:var(--np-biru) !important}
+.wadah{background:transparent !important}
+
+/* ══════ RESPONSIF (kisi mengikuti novelpia) ══════ */
+@media(max-width:1100px){
+  .rak,.grid,.hasil-grid{grid-template-columns:repeat(5,calc(20% - 19.2px)) !important;
+    grid-gap:20px !important}
+  .bagian-kepala h2{font-size:26px !important}}
+@media(max-width:880px){
+  .rak,.grid,.hasil-grid{grid-template-columns:repeat(4,calc(25% - 15px)) !important;
+    grid-gap:20px !important}
+  .bagian-kepala h2{font-size:22px !important}
+  .lebih{font-size:14px !important}
+  .kartu-judul{font-size:14px !important}
+  .hero-isi{flex-direction:column !important;align-items:flex-start !important;
+    gap:22px !important}
+  .hero-kanan{width:150px !important;align-self:flex-start}}
+@media(max-width:620px){
+  /* HP: 2 kolom + info DI BAWAH cover (novelpia mobile). */
+  .rak,.grid,.hasil-grid{grid-template-columns:repeat(2,1fr) !important;
+    grid-gap:16px !important}
+  .kartu{max-width:none;padding-bottom:70px !important}
+  .kartu-cover{overflow:visible;aspect-ratio:1/1.5 !important}
+  .kartu-cover img{border-radius:5px}
+  .kartu-isi{position:absolute;top:100%;left:0;right:0;height:auto;min-height:0;
+    background:none !important;padding:8px 2px 0;display:block}
+  .kartu-judul{color:var(--np-teks) !important;font-size:13px !important;
+    text-shadow:none;-webkit-line-clamp:2;margin-bottom:4px !important}
+  .kartu-meta{color:var(--np-redup) !important;text-shadow:none;font-size:11px !important}
+  .kartu .bab-pil,.kartu .pil{color:var(--np-biru2) !important;text-shadow:none;
+    font-size:11.5px !important}
+  .bagian-kepala h2{font-size:17px !important}
+  .lebih{font-size:12px !important}
+  .hero-kanan{display:none}
+  .hero{padding:22px 0 26px !important}
+  .hero-judul{font-size:22px !important}}

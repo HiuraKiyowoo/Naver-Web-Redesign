@@ -1,0 +1,23 @@
+{# ── paginasi (gaya Miruro) — butuh: page, total_hal, dasar_url (= dgn ?q= boleh) ── #}
+{% if total_hal and total_hal > 1 %}
+{% set pisah = '&' if '?' in dasar_url else '?' %}
+<nav class="halaman-nav" aria-label="Halaman">
+  {% if page > 1 %}
+  <a href="{{ dasar_url }}{{ pisah }}page={{ page - 1 }}">‹ Sebelumnya</a>
+  {% endif %}
+  {% set awal = [1, page - 2]|max %}
+  {% set akhir = [total_hal, page + 2]|min %}
+  {% if awal > 1 %}<a href="{{ dasar_url }}{{ pisah }}page=1">1</a>{% if awal > 2 %}<span>…</span>{% endif %}{% endif %}
+  {% for p in range(awal, akhir + 1) %}
+    {% if p == page %}
+    <span class="kini">{{ p }}</span>
+    {% else %}
+    <a href="{{ dasar_url }}{{ pisah }}page={{ p }}">{{ p }}</a>
+    {% endif %}
+  {% endfor %}
+  {% if akhir < total_hal %}{% if akhir < total_hal - 1 %}<span>…</span>{% endif %}<a href="{{ dasar_url }}{{ pisah }}page={{ total_hal }}">{{ total_hal }}</a>{% endif %}
+  {% if page < total_hal %}
+  <a href="{{ dasar_url }}{{ pisah }}page={{ page + 1 }}">Berikutnya ›</a>
+  {% endif %}
+</nav>
+{% endif %}

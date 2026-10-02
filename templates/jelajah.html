@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block judul %}Jelajah Novel: {{ nama }}{% endblock %}
+
+{% block isi %}
+<div class="wadah" style="padding-top:96px">
+
+  <div class="judul-hal">
+    <div>
+      <h1>Jelajah</h1>
+      <p>{{ '{:,}'.format(total).replace(',', '.') }} novel ditemukan</p>
+    </div>
+  </div>
+
+  {# ── KOTAK CARI (pindahan dari header) ── #}
+  <form class="cari-besar" action="/cari" method="get" role="search">
+    <span class="ikon" aria-hidden="true">⌕</span>
+    <input type="search" name="q" placeholder="Cari novel, penulis, atau isi bab"
+           value="{{ q|default('') }}" aria-label="Cari novel" autocomplete="off">
+    <button type="submit">Cari</button>
+  </form>
+
+  {# ── kotak pilihan (gaya Miruro taxonomy) ── #}
+  <div class="kotak4" style="margin:0 8px 24px">
+    <a href="/jelajah?order=populer"><i>◆</i><span>Populer</span></a>
+    <a href="/jelajah?order=rating"><i>★</i><span>Rating</span></a>
+    <a href="/jelajah?order=baru"><i>＋</i><span>Terbaru</span></a>
+    <a href="/jelajah?order=acak"><i>↻</i><span>Acak</span></a>
+  </div>
+
+  {# ── saring urutan ── #}
+  <div class="saring" style="margin-bottom:10px">
+    <span class="saring-label">Urut</span>
+    <a href="/jelajah?order=populer{% if q %}&q={{ q }}{% endif %}"{% if order=='populer' %} class="aktif"{% endif %}>Populer</a>
+    <a href="/jelajah?order=rating{% if q %}&q={{ q }}{% endif %}"{% if order=='rating' %} class="aktif"{% endif %}>Rating</a>
+    <a href="/jelajah?order=baru{% if q %}&q={{ q }}{% endif %}"{% if order=='baru' %} class="aktif"{% endif %}>Terbaru</a>
+    <a href="/jelajah?order=judul{% if q %}&q={{ q }}{% endif %}"{% if order=='judul' %} class="aktif"{% endif %}>A–Z</a>
+  </div>
+
+  {# ── saring status ── #}
+  <div class="saring" style="margin-bottom:10px">
+    <span class="saring-label">Status</span>
+    <a href="/jelajah?order={{ order }}{% if q %}&q={{ q }}{% endif %}"{% if not status %} class="aktif"{% endif %}>Semua</a>
+    <a href="/jelajah?status=ongoing&order={{ order }}{% if q %}&q={{ q }}{% endif %}"{% if status=='ongoing' %} class="aktif"{% endif %}>Ongoing</a>
+    <a href="/jelajah?status=completed&order={{ order }}{% if q %}&q={{ q }}{% endif %}"{% if status=='completed' %} class="aktif"{% endif %}>Tamat</a>
+  </div>
+
+  {# ── saring tipe ── #}
+  <div class="saring" style="margin-bottom:22px">
+    <span class="saring-label">Tipe</span>
+    <a href="/jelajah?order={{ order }}{% if status %}&status={{ status }}{% endif %}{% if q %}&q={{ q }}{% endif %}"{% if not tipe %} class="aktif"{% endif %}>Semua</a>
+    <a href="/jelajah?tipe=light&order={{ order }}{% if status %}&status={{ status }}{% endif %}{% if q %}&q={{ q }}{% endif %}"{% if tipe=='light' %} class="aktif"{% endif %}>Light Novel</a>
+    <a href="/jelajah?tipe=web&order={{ order }}{% if status %}&status={{ status }}{% endif %}{% if q %}&q={{ q }}{% endif %}"{% if tipe=='web' %} class="aktif"{% endif %}>Web Novel</a>
+  </div>
+
+  {# ── saring khusus (nyambung dari beranda) ── #}
+  <div class="saring" style="margin-bottom:22px">
+    <span class="saring-label">Khusus</span>
+    <a href="/jelajah?order=panjang">Paling Panjang</a>
+    <a href="/jelajah?order=rating">Rating Tertinggi</a>
+    <a href="/jelajah?order=ilustrasi">Bergambar</a>
+    <a href="/jelajah?order=acak">Acak</a>
+  </div>
+
+  {% if hasil %}
+  <div class="grid">
+    {% for n in hasil %}{% include "_kartu.html" %}{% endfor %}
+  </div>
+  {% else %}
+  <div class="kosong">
+    <b>Tidak ada hasil</b>
+    <span>Coba ubah saringan atau kata kunci.</span>
+    {# D) kalau yang dicari tidak ada → tawarkan Request #}
+    <div class="kosong-aksi">
+      <a class="tombol tombol-utama" href="/request?judul={{ q|urlencode }}">✦ Request novel ini</a>
+      <a class="tombol tombol-abu" href="/jelajah">Reset saringan</a>
+    </div>
+    <p class="redup" style="margin-top:14px">
+      Yang dicari belum ada di arsip? Kirim lewat menu <b>Request</b> — nanti aku cek.
+    </p>
+  </div>
+  {% endif %}
+
+  {# ── A) PAGINASI HALAMAN ── #}
+  {% if total_hal and total_hal > 1 %}
+  {% set dasar = '/jelajah?order=' ~ order
+     ~ ('&q=' ~ q if q else '')
+     ~ ('&status=' ~ status if status else '')
+     ~ ('&tipe=' ~ tipe if tipe else '')
+     ~ ('&genre=' ~ genre if genre else '')
+     ~ ('&tag=' ~ tag if tag else '')
+     ~ ('&negara=' ~ negara if negara else '') %}
+  <nav class="hal-nav" aria-label="Halaman">
+    {% if page > 1 %}
+    <a class="hal-tombol" href="{{ dasar }}&page={{ page - 1 }}" rel="prev">‹ Sebelumnya</a>
+    {% else %}
+    <span class="hal-tombol hal-mati">‹ Sebelumnya</span>
+    {% endif %}
+
+    <div class="hal-angka">
+      {% set mulai = [1, page - 2]|max %}
+      {% set akhir = [total_hal, mulai + 4]|min %}
+      {% set mulai = [1, akhir - 4]|max %}
+      {% if mulai > 1 %}
+      <a class="hal-angka-item" href="{{ dasar }}&page=1">1</a>
+      {% if mulai > 2 %}<span class="hal-titik">…</span>{% endif %}
+      {% endif %}
+      {% for p in range(mulai, akhir + 1) %}
+      {% if p == page %}
+      <span class="hal-angka-item aktif" aria-current="page">{{ p }}</span>
+      {% else %}
+      <a class="hal-angka-item" href="{{ dasar }}&page={{ p }}">{{ p }}</a>
+      {% endif %}
+      {% endfor %}
+      {% if akhir < total_hal %}
+      {% if akhir < total_hal - 1 %}<span class="hal-titik">…</span>{% endif %}
+      <a class="hal-angka-item" href="{{ dasar }}&page={{ total_hal }}">{{ total_hal }}</a>
+      {% endif %}
+    </div>
+
+    {% if page < total_hal %}
+    <a class="hal-tombol" href="{{ dasar }}&page={{ page + 1 }}" rel="next">Berikutnya ›</a>
+    {% else %}
+    <span class="hal-tombol hal-mati">Berikutnya ›</span>
+    {% endif %}
+  </nav>
+  <div class="hal-info">
+    Halaman {{ page }} dari {{ total_hal }} · {{ '{:,}'.format(total).replace(',', '.') }} novel
+  </div>
+  {% endif %}
+
+  {# ── genre & tag (pil) ── #}
+  {% if genre_list %}
+  <section class="bagian" style="margin-top:44px">
+    <div class="bagian-kepala">
+      <div class="bagian-kiri"><h2>Genre</h2><span class="bagian-sub">Semua kategori</span></div>
+    </div>
+    <div class="pil-baris">
+      {% for g in genre_list %}
+      <a class="chip{% if genre==g.slug %} aktif{% endif %}" href="/jelajah?genre={{ g.slug }}&order={{ order }}">{{ g.nama }} <b>{{ g.j }}</b></a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if tag_list %}
+  <section class="bagian">
+    <div class="bagian-kepala">
+      <div class="bagian-kiri"><h2>Tag</h2><span class="bagian-sub">Kata kunci</span></div>
+    </div>
+    <div class="pil-baris">
+      {% for t in tag_list %}
+      <a class="chip{% if tag==t.slug %} aktif{% endif %}" href="/jelajah?tag={{ t.slug }}&order={{ order }}">{{ t.nama }} <b>{{ t.jumlah_novel }}</b></a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% include "_halaman.html" %}
+</div>
+{% endblock %}

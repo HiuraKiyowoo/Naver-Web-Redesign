@@ -1,0 +1,16 @@
+{# Kartu novel — gaya Miruro: 108px, cover 3/4.5, badge kiri-atas, tipe kanan-bawah,
+   judul 10px POTONG 1 BARIS. Isi = field milik kita. #}
+<a class="kartu" href="{{ n.url }}">
+  <div class="kartu-cover{% if not n.cover %} skeleton{% endif %}">
+    {% if n.cover %}
+      <img src="{{ n.cover }}" alt="Cover {{ n.judul }}" loading="lazy">
+    {% else %}
+      <div class="tanpa-cover">{{ n.judul[:1] }}</div>
+    {% endif %}
+    {% if n.rating and n.rating >= 1 %}
+      <span class="lencana">★ {{ n.rating }}</span>
+    {% endif %}
+    {% if n.tipe %}<span class="kartu-tipe">{{ n.tipe }}</span>{% endif %}
+  </div>
+  <h3 class="kartu-judul">{{ n.judul }}</h3>
+</a>

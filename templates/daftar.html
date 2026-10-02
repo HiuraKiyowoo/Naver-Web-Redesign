@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block judul %}{{ kepala }}: {{ nama }}{% endblock %}
+
+{% block isi %}
+<div class="wadah" style="padding-top:96px">
+
+  {# ── kotak pilihan (gaya Miruro taxonomy) ── #}
+  <div class="kotak4" style="margin:0 8px 24px">
+    <a href="/jelajah?order=populer"><i>◆</i><span>Populer</span></a>
+    <a href="/jelajah?order=rating"><i>★</i><span>Rating</span></a>
+    <a href="/jelajah?order=baru"><i>＋</i><span>Terbaru</span></a>
+    <a href="/jelajah?order=acak"><i>↻</i><span>Acak</span></a>
+  </div>
+
+  <div class="judul-hal">
+    <div>
+      <h1>{{ kepala }}</h1>
+      <p>{{ '{:,}'.format(total).replace(',', '.') }} novel</p>
+    </div>
+  </div>
+
+  {% if hasil %}
+  <div class="grid">
+    {% for n in hasil %}{% include "_kartu.html" %}{% endfor %}
+  </div>
+  {% else %}
+  <div class="kosong">
+    <b>Belum ada novel</b>
+    <span>Daftar ini masih kosong.</span>
+  </div>
+  {% endif %}
+
+  {% include "_halaman.html" %}
+</div>
+{% endblock %}

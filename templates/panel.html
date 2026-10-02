@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block judul %}Panel Admin · {{ nama }}{% endblock %}
+
+{% block isi %}
+<div class="wadah admin-halaman">
+
+  <div class="kepala-halaman admin-hero">
+    <h1>Panel Admin</h1>
+    <span>Ringkasan arsip &amp; kesehatan server</span>
+  </div>
+
+  <div class="panel-awas">
+    🔐 Halaman ini hanya bisa dibuka oleh akun admin. Orang lain yang mencoba
+    alamat ini akan melihat halaman <b>404 tidak ditemukan</b>.
+  </div>
+
+  {# ── 1) KESEHATAN SERVER ── #}
+  <section class="panel-bagian">
+    <h2 class="panel-judul">Kesehatan Server <span id="panelWaktu" class="panel-jam">memuat…</span></h2>
+    <div class="panel-grid" id="panelSehat">
+      <div class="panel-kartu"><b>—</b><span>memuat…</span></div>
+    </div>
+  </section>
+
+  {# ── 2) ARSIP ── #}
+  <section class="panel-bagian">
+    <h2 class="panel-judul">Arsip</h2>
+    <div class="panel-angka" id="panelArsip">
+      <div class="panel-kotak"><b>—</b><span>memuat…</span></div>
+    </div>
+  </section>
+
+  {# ── 3) PENGGUNA ── #}
+  <section class="panel-bagian">
+    <h2 class="panel-judul">Pengguna &amp; Interaksi</h2>
+    <div class="panel-angka" id="panelPengguna">
+      <div class="panel-kotak"><b>—</b><span>memuat…</span></div>
+    </div>
+  </section>
+
+  {# ── 4) SUMBER NOVEL ── #}
+  <section class="panel-bagian">
+    <h2 class="panel-judul">Asal Sumber Novel</h2>
+    <div class="panel-tabel" id="panelSumber"><span class="panel-muat">memuat…</span></div>
+  </section>
+
+  {# ── 5) NOVEL TERBARU MASUK ── #}
+  <section class="panel-bagian">
+    <h2 class="panel-judul">Novel Terbaru Masuk</h2>
+    <div class="panel-tabel" id="panelTerbaru"><span class="panel-muat">memuat…</span></div>
+  </section>
+
+  {# ── 6) AKUN TERDAFTAR ── #}
+  <section class="panel-bagian">
+    <h2 class="panel-judul">Akun Terdaftar <span class="panel-jam">(10 terbaru)</span></h2>
+    <div class="panel-tabel" id="panelAkun"><span class="panel-muat">memuat…</span></div>
+  </section>
+
+  <div class="panel-tombol">
+    <button class="tombol tombol-utama" id="panelMuat">Muat ulang</button>
+    <a class="tombol tombol-abu" href="/status">Status publik</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var el = function (id) { return document.getElementById(id); };
+
+  function angka(n) {
+    if (n === null || n === undefined) return '—';
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+  function huruf(n) {
+    if (!n) return '—';
+    if (n >= 1e9) return (n / 1e9).toFixed(2) + ' M';
+    if (n >= 1e6) return (n / 1e6).toFixed(2) + ' jt';
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + ' rb';
+    return String(n);
+  }
+  function aman(t) {
+    return String(t == null ? '' : t).replace(/[<>&"]/g, function (c) {
+      return { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c];
+    });
+  }
+
+  function kartu(kotak, isi) {
+    kotak.innerHTML = isi.map(function (x) {
+      var kelas = x[2] ? ' panel-' + x[2] : '';
+      return '<div class="' + (kotak.classList.contains('panel-grid') ? 'panel-kartu' : 'panel-kotak') + kelas + '">' +
+             '<b>' + aman(x[1]) + '</b><span>' + aman(x[0]) + '</span></div>';
+    }).join('');
+  }
+
+  function tabel(kotak, baris, judul, bikin) {
+    if (!baris || !baris.length) { kotak.innerHTML = '<span class="panel-muat">(kosong)</span>'; return; }
+    var h = '<table class="panel-tbl"><thead><tr>';
+    judul.forEach(function (j) { h += '<th>' + aman(j) + '</th>'; });
+    h += '</tr></thead><tbody>';
+    baris.forEach(function (r) {
+      h += '<tr>';
+      bikin(r).forEach(function (sel) { h += '<td>' + sel + '</td>'; });
+      h += '</tr>';
+    });
+    kotak.innerHTML = h + '</tbody></table>';
+  }
+
+  function muat() {
+    el('panelWaktu').textContent = 'memuat…';
+    fetch('/api/panel/status', { credentials: 'same-origin' })
+      .then(function (r) {
+        var ct = (r.headers.get('content-type') || '');
+        if (ct.indexOf('json') < 0) throw new Error('server membalas halaman, bukan data');
+        return r.json();
+      })
+      .then(function (d) {
+        if (!d || !d.ok) { el('panelWaktu').textContent = 'gagal memuat'; return; }
+        el('panelWaktu').textContent = '· ' + new Date().toLocaleString('id-ID');
+
+        var s = d.sehat || {};
+        function lambang(v, ms) {
+          if (v === 200) return ['OK' + (ms ? ' (' + ms + ' ms)' : ''), '✔', 'ok'];
+          if (v === true) return ['hidup', '✔', 'ok'];
+          if (v === false) return ['MATI', '✘', 'mati'];
+          return [v === null || v === undefined ? 'tidak diketahui' : String(v), '⚠', 'awas'];
+        }
+        var wk = [];
+        var b = lambang(s.web_8100); wk.push([b[0], 'Web 8100 (' + b[1] + ')', b[2]]);
+        var c = lambang(s.api_8000); wk.push([c[0], 'API APK 8000 (' + c[1] + ')', c[2]]);
+        var e = lambang(s.tunnel); wk.push([e[0], 'Tunnel Cloudflare (' + e[1] + ')', e[2]]);
+        var f = lambang(s.web_proses); wk.push([f[0], 'Proses web (' + f[1] + ')', f[2]]);
+        kartu(el('panelSehat'), wk);
+
+        var ar = d.arsip || {};
+        kartu(el('panelArsip'), [
+          [huruf(ar.novel), 'Novel'],
+          [huruf(ar.bab), 'Bab'],
+          [huruf(ar.ilustrasi), 'Ilustrasi'],
+          [huruf(ar.huruf_bab_perkiraan) + ' huruf', 'Total teks bab (perkiraan)'],
+          [angka(ar.tanpa_cover), 'Novel tanpa poster', ar.tanpa_cover ? 'awas' : 'ok'],
+          [angka(ar.tanpa_sinopsis), 'Novel tanpa sinopsis', ar.tanpa_sinopsis ? 'awas' : 'ok'],
+          [angka(ar.rating_kosong), 'Rating masih 0', ar.rating_kosong ? 'awas' : 'ok'],
+        ]);
+
+        var pg = d.pengguna || {};
+        kartu(el('panelPengguna'), [
+          [angka(pg.pengguna), 'Pengguna'],
+          [angka(pg.baru24), 'Daftar 24 jam'],
+          [angka(pg.sesi), 'Sesi aktif'],
+          [angka(pg.favorit), 'Favorit'],
+          [angka(pg.baca), 'Riwayat baca'],
+          [angka(pg.request), 'Request masuk'],
+        ]);
+
+        tabel(el('panelSumber'), d.sumber || [], ['Sumber', 'Jumlah'],
+          function (r) { return [aman(r.s), angka(r.c)]; });
+
+        tabel(el('panelTerbaru'), d.terbaru || [], ['ID', 'Judul', 'Bab'],
+          function (r) {
+            return [aman(r.id), '<a href="/novel/' + aman(r.slug) + '">' + aman(r.judul || r.slug) + '</a>', angka(r.jumlah_bab)];
+          });
+
+        tabel(el('panelAkun'), d.akun || [], ['ID', 'Email', 'Nama', 'Peran', 'Dibuat'],
+          function (r) {
+            return [aman(r.id), aman(r.email), aman(r.nama), aman(r.peran), aman((r.dibuat || '').slice(0, 10))];
+          });
+      })
+      .catch(function (err) {
+        el('panelWaktu').textContent = 'galat: ' + (err.message || 'tidak diketahui');
+      });
+  }
+
+  el('panelMuat').addEventListener('click', muat);
+  muat();
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block judul %}{{ judul|default(nama) }}{% endblock %}</title>
+<meta name="description" content="{{ desk|default('') }}">
+<link rel="canonical" href="{{ kanon|default(situs) }}">
+{% if gambar_og %}{% set og_url = (situs + gambar_og) if gambar_og[:4] != 'http' else gambar_og %}
+<meta property="og:image" content="{{ og_url }}">{% endif %}
+<meta property="og:title" content="{{ judul|default(nama) }}">
+<meta property="og:description" content="{{ desk|default('') }}">
+<meta property="og:site_name" content="{{ nama }}">
+<meta name="theme-color" content="#12151A">
+<link rel="icon" type="image/png" sizes="64x64" href="/static/img/favicon.png">
+<link rel="apple-touch-icon" href="/static/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700;800;900&display=swap">
+{# versi CSS ikut mtime berkas → CF & browser otomatis ambil yang baru #}
+<link rel="stylesheet" href="/static/miruro.css?v={{ versi_aset() }}">
+<script src="/static/web.js?v={{ versi_aset() }}" defer></script>
+{% block kepala %}{% endblock %}
+</head>
+<body>
+<header class="kepala">
+  <div class="kepala-dalam">
+    <a class="logo logo-gambar" href="/" aria-label="{{ nama }} — beranda">
+      <img src="/static/img/logo-320.png" alt="{{ nama }}" width="320" height="197" class="logo-img">
+    </a>
+    <button class="hamburger" id="btnLaci" data-drawer-open aria-label="Buka menu" aria-expanded="false" aria-controls="nnDrawer">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+{# ── LACI SAMPING (semua menu) ── #}
+{# versi baru 29 Sep: berkas sendiri _drawer.html, kiriman user + 4 penyesuaian #}
+{% include "_drawer.html" %}
+
+
+{% block isi %}{% endblock %}
+
+<footer class="kaki">
+  <div class="wadah kaki-dalam">
+    <div class="kaki-merek">
+      <b class="logo-gambar kaki-logo">
+        <img src="/static/img/logo-putih-320.png" alt="{{ nama }}" width="320" height="197" class="logo-img">
+      </b>
+      <strong class="kaki-nama">Novel Translation Archive</strong>
+      <nav class="kaki-tautan" aria-label="Tautan komunitas">
+        <span>Telegram</span><i aria-hidden="true">·</i><span>Discord</span><i aria-hidden="true">·</i><span>DMCA</span>
+      </nav>
+    </div>
+  </div>
+  <div class="kaki-bawah"><span>© 2026 Naver Novel</span></div>
+</footer>
+
+</body>
+</html>

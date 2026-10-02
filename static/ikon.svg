@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Naver Novel">
+  <rect width="64" height="64" rx="14" fill="#071018"/>
+  <path d="M18 46V18h6.6l14.2 18.4V18H46v28h-6.6L25.2 27.6V46H18z" fill="#049DFD"/>
+  <rect x="18" y="49.5" width="28" height="3" rx="1.5" fill="#0E1B26"/>
+</svg>

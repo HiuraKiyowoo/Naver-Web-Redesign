@@ -1,0 +1,46 @@
+{# MINGGU INI — section sorotan gaya "Opening Story".
+   Butuh: minggu (daftar novel dari main.py, sudah ada cover/url/tags/desk/penulis).
+   ⚠️ 3 cover: tetangga kiri/kanan = novel sebelum/sesudah (melengkung).
+   ⚠️ Semua teks diisi JS dari data-* — supaya Prev/Next bisa ganti tanpa
+      memuat ulang halaman. Kalau JS mati, novel PERTAMA tetap tampil.
+   ⚠️ Warna memakai tema kita (charcoal + cyan), BUKAN ungu bawaan code. #}
+{% if minggu %}
+<section class="bagian mg-section">
+  <div class="mg-eyebrow">
+    <h2>Minggu Ini</h2>
+    <a href="/jelajah?status=Completed">Jelajah</a>
+  </div>
+
+  {# data lengkap buat JS (JSON di atribut, bukan di <script> — lebih aman) #}
+  <div class="mg-data" id="mgData"
+       data-minggu='{{ minggu | tojson }}'></div>
+
+  <div class="mg-stage">
+    <a class="mg-cov mg-side" id="mgKiri" href="#"><img src="" alt="" id="mgKiriImg"></a>
+    <a class="mg-cov mg-main" id="mgUtama" href="#"><img src="" alt="" id="mgUtamaImg"></a>
+    <a class="mg-cov mg-side" id="mgKanan" href="#"><img src="" alt="" id="mgKananImg"></a>
+  </div>
+
+  <div class="mg-tags" id="mgTags"></div>
+
+  <div class="mg-meta">
+    <div class="mg-judul" id="mgJudul"></div>
+    <div class="mg-penulis">Penulis <b id="mgPenulis"></b></div>
+    <p class="mg-desk" id="mgDesk"></p>
+    <a class="mg-more" id="mgMore" href="#">+ selengkapnya</a>
+  </div>
+
+  <div class="mg-nav">
+    <button type="button" aria-label="Sebelumnya" data-dir="-1" id="mgPrev">
+      <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <div class="mg-tengah">
+      <b>Sebelumnya</b> : <span id="mgPrevJudul">—</span><br>
+      <b>Berikutnya</b> : <span id="mgNextJudul">—</span>
+    </div>
+    <button type="button" aria-label="Berikutnya" data-dir="1" id="mgNext">
+      <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</section>
+{% endif %}

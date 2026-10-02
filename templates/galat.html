@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block judul %}{{ kode }}: {{ pesan }} | {{ nama }}{% endblock %}
+
+{% block isi %}
+<div class="wadah" style="padding-top:110px">
+  <div class="kosong" style="padding:60px 20px">
+    <b style="font-size:56px;line-height:1;color:var(--cyan);letter-spacing:-.04em">{{ kode }}</b>
+    <b style="margin-top:14px;font-size:19px">{{ pesan }}</b>
+    <span>{{ rinci }}</span>
+    <div class="detail-aksi" style="justify-content:center;margin-top:26px">
+      <a class="tombol tombol-utama" href="/">Ke Beranda</a>
+      <a class="tombol tombol-abu" href="/jelajah">Jelajah Novel</a>
+    </div>
+  </div>
+
+  {% if q %}
+  <section class="bagian">
+    <div class="bagian-kepala">
+      <div class="bagian-kiri"><h2>Coba Cari</h2><span class="bagian-sub">Mungkin maksudmu ini</span></div>
+    </div>
+    <div class="pil-baris">
+      <a class="chip" href="/cari?q={{ q }}">Cari “{{ q }}”</a>
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

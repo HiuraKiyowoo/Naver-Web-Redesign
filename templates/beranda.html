@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block judul %}{{ nama }}: Baca Novel Terjemahan Indonesia Gratis{% endblock %}
+
+{% block isi %}
+
+{# ── HERO CAROUSEL 16:9 (gaya Miruro) — pakai novel rating tertinggi ── #}
+{% if hero %}
+<section class="hero">
+  <div class="hero-track" id="heroTrack">
+    {% for h in hero %}
+    <article class="hero-item{% if loop.first %} aktif{% endif %}">
+      {% if h.cover %}<img class="hero-banner" src="{{ h.cover }}" alt="" loading="{{ 'eager' if loop.first else 'lazy' }}">{% endif %}
+      <div class="hero-gelap1"></div>
+      <div class="hero-gelap2"></div>
+      <div class="hero-dalam">
+        {% if h.cover %}<img class="hero-cover" src="{{ h.cover }}" alt="Cover {{ h.judul }}">{% endif %}
+      </div>
+      <div class="hero-bawah">
+        {% if h.tipe %}<span class="hero-pil">{{ h.tipe }}</span>{% endif %}
+        {% if h.status %}<span class="hero-pil">{{ h.status }}</span>{% endif %}
+        <a class="hero-btn" href="{{ h.url }}">Baca →</a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% if hero|length > 1 %}
+  <div class="hero-titik" id="heroTitik">
+    {% for h in hero %}<span{% if loop.first %} class="on"{% endif %}></span>{% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+<div class="wadah">
+
+{# ── SECTION pembantu (gaya Miruro: judul uppercase + panah) ── #}
+{% macro bagian(judul, sub, tautan, id, daftar, lencana='rating', rak2=False, bernomor=False) %}
+{% if daftar %}
+<section class="bagian">
+  <div class="bagian-kepala">
+    <a class="bagian-kiri" href="{{ tautan }}">
+      <h2>{{ judul }}</h2>
+      <span class="bagian-sub">{{ sub }}</span>
+    </a>
+    <div class="bagian-panah">
+      <button type="button" data-geser="kiri" data-rak="{{ id }}" aria-label="Sebelumnya">‹</button>
+      <button type="button" data-geser="kanan" data-rak="{{ id }}" aria-label="Berikutnya">›</button>
+    </div>
+  </div>
+  <div class="{{ 'rak2' if rak2 else 'rak' }}" id="{{ id }}">
+    {% for n in daftar %}
+      {% if bernomor %}{% include "_kartu_nomor.html" %}{% else %}{% include "_kartu.html" %}{% endif %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endmacro %}
+
+{{ bagian('Update Terbaru', 'Bab paling baru masuk', '/jelajah?order=update', 'r4', update, 'bab', rak2=True, bernomor=True) }}
+{{ bagian('Rating Tertinggi', 'Nilai 4.2 ke atas dari pembaca', '/jelajah?order=rating', 'r2', premium, 'rating') }}
+{{ bagian('Baru Ditambahkan', 'Terakhir masuk arsip', '/jelajah?order=baru', 'r3', baru, 'status') }}
+
+{# ── Jelajahi Acak: KIPAS kartu miring (khusus section ini) ── #}
+{% if acak %}
+<section class="bagian">
+  <div class="bagian-kepala">
+    <a class="bagian-kiri" href="/jelajah?order=acak">
+      <h2>Jelajahi Acak</h2>
+      <span class="bagian-sub">Pilihan acak hari ini</span>
+    </a>
+  </div>
+  {% include "_kipas.html" %}
+</section>
+{% endif %}
+
+{# ── Telusuri Genre (pil) ── #}
+{% if genre %}
+<section class="bagian">
+  <div class="bagian-kepala">
+    <a class="bagian-kiri" href="/jelajah">
+      <h2>Telusuri Genre</h2>
+      <span class="bagian-sub">Pilih sesuai selera</span>
+    </a>
+  </div>
+  <div class="pil-baris">
+    {% for g in genre %}
+    <a class="chip" href="/genre/{{ g.slug }}">{{ g.nama }} <b>{{ g.jumlah }}</b></a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{{ bagian('Masih Jalan', 'Belum tamat, masih berlanjut', '/jelajah?status=ongoing', 'r5b', ongoing, 'status') }}
+{{ bagian('Sudah Tamat', 'Lengkap sampai akhir', '/jelajah?status=Completed', 'r5', tamat, 'status') }}
+
+{# ── MINGGU INI: section BARU sorotan 3 cover ── #}
+{% include "_minggu.html" %}
+{# ── Tag Populer (pil) ── #}
+{% if tag %}
+<section class="bagian">
+  <div class="bagian-kepala">
+    <a class="bagian-kiri" href="/jelajah">
+      <h2>Tag Populer</h2>
+      <span class="bagian-sub">Kata kunci terbanyak</span>
+    </a>
+  </div>
+  <div class="pil-baris">
+    {% for t in tag %}
+    <a class="chip" href="/tag/{{ t.slug }}">{{ t.nama }} <b>{{ t.jumlah_novel }}</b></a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{{ bagian('Web Novel', 'Novel web dari sumber online', '/jelajah?tipe=web', 'r9', webnovel, 'status') }}
+{{ bagian('Light Novel', 'Novel terbitan berilustrasi', '/jelajah?tipe=light', 'r10', light, 'status') }}
+
+
+{# ── Baru Dibuka (rak) ── #}
+{{ bagian('Baru Dibuka', 'Baru mulai dibaca', '/jelajah?order=baru', 'r7', dibuka, 'status') }}
+
+</div>
+{% endblock %}

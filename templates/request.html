@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block judul %}{{ judul }}{% endblock %}
+
+{% block isi %}
+<div class="wadah req-halaman">
+  <section class="req-hero" aria-labelledby="judulRequest">
+    <div class="req-hero-copy">
+      <span class="req-eyebrow">Naver · Koleksi novel</span>
+      <h1 id="judulRequest">Request Novel</h1>
+      <p>Belum menemukan novel yang kamu cari? Kirim judulnya, nanti kami cek dan tambahkan ke daftar bacaan.</p>
+    </div>
+    <div class="req-hero-badge"><b>01</b><span>Ajukan<br>novel</span></div>
+  </section>
+
+  {% if not pengguna %}
+  <section class="panel req-masuk req-card-modern">
+    <div class="req-card-icon" aria-hidden="true">↗</div>
+    <div class="req-card-copy">
+      <span class="req-card-kicker">Satu langkah lagi</span>
+      <h2>Masuk untuk mengirim request</h2>
+      <p>Request akan tersimpan di akunmu, jadi kamu bisa melihat statusnya kapan saja.</p>
+    </div>
+    <div class="req-masuk-aksi">
+      <a class="tombol tombol-utama" href="/masuk?lanjut=/request">Masuk / Daftar <span aria-hidden="true">→</span></a>
+      <a class="tombol tombol-abu" href="/jelajah">Jelajah dulu</a>
+    </div>
+  </section>
+
+  {% else %}
+  <div class="req-grid">
+    <section class="panel req-kotak req-form-card">
+      <div class="req-section-head">
+        <div>
+          <span class="req-card-kicker">Formulir request</span>
+          <h2>Novel yang kamu inginkan</h2>
+        </div>
+        <span class="req-step">01 / 01</span>
+      </div>
+
+      <form id="formRequest" novalidate>
+        <label class="req-label" for="reqJudul">Judul novel <span class="req-wajib">*</span></label>
+        <input class="req-input" id="reqJudul" name="judul" type="text" maxlength="200"
+               placeholder="Contoh: Omniscient Reader's Viewpoint" autocomplete="off" required>
+
+        <label class="req-label" for="reqSumber">Link sumber <span class="redup">opsional</span></label>
+        <input class="req-input" id="reqSumber" name="sumber" type="text" maxlength="400"
+               placeholder="https://… (kalau ada)" autocomplete="off" inputmode="url">
+        <span class="req-field-hint">Boleh link dari situs asal atau halaman referensi.</span>
+
+        <label class="req-label" for="reqCatatan">Catatan <span class="redup">opsional</span></label>
+        <textarea class="req-input req-area" id="reqCatatan" name="catatan" maxlength="600" rows="4"
+                  placeholder="Maksudku novel yang… / sudah tamat belum?"></textarea>
+
+        <div class="req-kaki">
+          <span class="req-hitung" id="reqHitung">0/600</span>
+          <button class="tombol tombol-utama req-submit" type="submit" id="reqKirim">Kirim Request <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="req-pesan" id="reqPesan" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <aside class="req-info" aria-label="Informasi request">
+      <div class="req-info-card">
+        <span class="req-info-number">01</span>
+        <h3>Tulis judul yang jelas</h3>
+        <p>Gunakan judul resmi novel supaya lebih mudah ditemukan.</p>
+      </div>
+      <div class="req-info-card">
+        <span class="req-info-number">02</span>
+        <h3>Tambahkan referensi</h3>
+        <p>Link sumber membantu proses pengecekan jadi lebih cepat.</p>
+      </div>
+      <div class="req-info-note"><span aria-hidden="true">i</span><p>Maksimal 5 request dalam 1 jam. Statusnya bisa kamu pantau di bawah.</p></div>
+    </aside>
+  </div>
+
+  {% if permintaan %}
+  <section class="req-riwayat">
+    <div class="req-section-head req-history-head">
+      <div>
+        <span class="req-card-kicker">Aktivitas akun</span>
+        <h2>Request kamu</h2>
+      </div>
+      <span class="req-history-count">{{ permintaan|length }} terakhir</span>
+    </div>
+    <div class="req-daftar">
+      {% for r in permintaan %}
+      <div class="req-baris">
+        <div class="req-baris-nomor">{{ '%02d'|format(loop.index) }}</div>
+        <div class="req-baris-utama">
+          <b>{{ r.judul }}</b>
+          <span class="redup">Dikirim {{ r.waktu[:16] if r.waktu else '' }}</span>
+        </div>
+        <span class="req-status req-status-{{ r.status }}">{{ r.status }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

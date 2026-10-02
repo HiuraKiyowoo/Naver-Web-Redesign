@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block judul %}{{ judul }}{% endblock %}
+
+{% block isi %}
+
+{# ── latar blur dari cover sendiri (gaya Miruro) ── #}
+{% if cover %}
+<div class="detail-latar"><img src="{{ cover }}" alt=""></div>
+{% endif %}
+
+<div class="detail wadah">
+
+  {# ── cover + info ── #}
+  <div class="detail-atas">
+    {% if cover %}
+      <img class="detail-cover" src="{{ cover }}" alt="Cover {{ n.judul }}">
+    {% else %}
+      <div class="detail-cover skeleton"></div>
+    {% endif %}
+
+    <div class="detail-info">
+      <h1 class="detail-judul">{{ n.judul }}</h1>
+      {% if n.judul_alternatif or n.judul_asli %}
+      <p class="detail-alt">{{ n.judul_asli or '' }}{% if n.judul_asli and n.judul_alternatif %}<br>{% endif %}{{ n.judul_alternatif or '' }}</p>
+      {% endif %}
+
+      <div class="detail-lencana">
+        {% if n.tipe %}<span class="lc-tipe">{{ n.tipe }}</span>{% endif %}
+        {% if n.status %}<span class="lc-status">{{ n.status }}</span>{% endif %}
+        {% if n.rating and n.rating >= 1 %}<span class="lc-rating">★ {{ n.rating }}</span>{% endif %}
+        {% if n.jumlah_bab %}<span class="lc-abu">{{ n.jumlah_bab }} bab</span>{% endif %}
+        {% if n.tahun %}<span class="lc-abu">{{ n.tahun }}</span>{% endif %}
+      </div>
+
+      <div class="detail-kotak">
+        {% if n.penulis or n.author %}
+        <div><small>Penulis</small><b>{{ n.penulis or n.author }}</b></div>
+        {% endif %}
+        {% if n.ilustrator %}<div><small>Ilustrator</small><b>{{ n.ilustrator }}</b></div>{% endif %}
+        {% if n.penerbit %}<div><small>Penerbit</small><b>{{ n.penerbit }}</b></div>{% endif %}
+        {% if n.country %}<div><small>Negara</small><b>{{ n.country }}</b></div>{% endif %}
+        {% if n.sumber_web %}<div><small>Sumber</small><b>{{ n.sumber_web }}</b></div>{% endif %}
+      </div>
+
+      {% if genre or tag %}
+      {# ── GENRE: maksimal 3 tampil, sisanya disembunyikan di balik "+N lagi" ── #}
+      <div class="detail-genre" id="detailGenre">
+        {% for g in genre[:3] %}
+          <a href="/genre/{{ g.slug }}">{{ g.nama }}</a>
+        {% endfor %}
+
+        {% if genre|length > 3 %}
+          <span class="genre-sisa" id="genreSisa" hidden>
+            {% for g in genre[3:] %}<a href="/genre/{{ g.slug }}">{{ g.nama }}</a>{% endfor %}
+          </span>
+          <button type="button" class="genre-lagi" id="genreLagi"
+                  aria-expanded="false" aria-controls="genreSisa">
+            +{{ genre|length - 3 }} lagi
+          </button>
+        {% endif %}
+      </div>
+
+      {# ── TAG: pola sama, maksimal 6 (tag biasanya lebih banyak) ── #}
+      {% if tag %}
+      <div class="detail-genre detail-tag" id="detailTag">
+        {% for t in tag[:6] %}<a href="/tag/{{ t.slug }}">#{{ t.nama }}</a>{% endfor %}
+        {% if tag|length > 6 %}
+          <span class="genre-sisa" id="tagSisa" hidden>
+            {% for t in tag[6:] %}<a href="/tag/{{ t.slug }}">#{{ t.nama }}</a>{% endfor %}
+          </span>
+          <button type="button" class="genre-lagi" id="tagLagi"
+                  aria-expanded="false" aria-controls="tagSisa">
+            +{{ tag|length - 6 }} lagi
+          </button>
+        {% endif %}
+      </div>
+      {% endif %}
+      {% endif %}
+
+      {% if n.sinopsis %}
+      <p class="detail-sinopsis" id="sinopsis">{{ n.sinopsis }}</p>
+      {% endif %}
+
+      <div class="detail-aksi">
+        {% if lanjut and lanjut > 3 %}
+        <a class="tombol tombol-utama" href="/novel/{{ n.slug }}/bab/{{ lanjut }}">▶ Lanjut baca · Bab {{ lanjut }}</a>
+        <a class="tombol tombol-abu" href="/novel/{{ n.slug }}/bab/{{ bab[0].urutan }}">Mulai dari Bab 1</a>
+        {% elif bab %}
+        <a class="tombol tombol-utama" href="/novel/{{ n.slug }}/bab/{{ bab[0].urutan }}">Baca Bab 1</a>
+        <a class="tombol tombol-abu" href="#daftar-bab">Daftar Bab</a>
+        {% endif %}
+        <button type="button" class="tombol tombol-hati{% if favorit %} aktif{% endif %}"
+                id="btnFavorit" data-novel="{{ n.id }}"
+                aria-pressed="{{ 'true' if favorit else 'false' }}"
+                title="{% if pengguna %}Simpan ke Pustaka{% else %}Masuk untuk menyimpan{% endif %}">
+          <span class="hati">{% if favorit %}♥{% else %}♡{% endif %}</span>
+          <span class="hati-teks">{% if favorit %}Tersimpan{% else %}Favorit{% endif %}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {# ── daftar bab ──
+     Kalau novel PUNYA volume → collapsible per Volume (klik untuk buka).
+     Kalau TIDAK punya volume → daftar bab langsung seperti sebelumnya. #}
+  {% if bab %}
+  <div class="panel" id="daftar-bab">
+    <div class="panel-kepala">
+      <h3>Bab ({{ jlh_bab }})</h3>
+    </div>
+
+    {% if grup_volume %}
+    {# ── COLLAPSIBLE PER VOLUME ── #}
+    <div class="vol-daftar">
+      {% for g in grup_volume %}
+      <details class="vol-item">
+        <summary class="vol-kepala">
+          <span class="vol-nama">Volume {{ g.volume }}</span>
+          <span class="vol-jml">{{ g.bab|length }} bab</span>
+          <span class="vol-panah" aria-hidden="true"></span>
+        </summary>
+        <div class="bab-daftar">
+          {% for b in g.bab %}
+          {% set kunci = (not pengguna) and (b.urutan > batas_bab) %}
+          {% set sudah = b.urutan in sudah %}
+          <a class="bab-item{% if kunci %} bab-terkunci{% endif %}{% if sudah %} bab-sudah{% endif %}" href="/novel/{{ n.slug }}/bab/{{ b.urutan }}">
+            <span class="bab-kiri">
+              <span class="bab-no">{% if sudah %}<span class="bab-cek" title="Sudah dibaca" aria-label="Sudah dibaca">✓</span>{% endif %}Bab {{ b.nomor or b.urutan }}</span>
+              {% if b.judul %}<span class="bab-judul">{{ b.judul }}</span>{% endif %}
+            </span>
+            <span class="bab-kanan">{% if kunci %}<span class="gkunci" title="Perlu masuk untuk membaca" aria-label="Terkunci">{% include "_gembok.html" %}</span>{% else %}›{% endif %}</span>
+          </a>
+          {% endfor %}
+        </div>
+      </details>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    {# ── TANPA VOLUME: daftar bab langsung (TERBARU DI ATAS) ── #}
+    <div class="bab-daftar">
+      {% for b in bab|reverse %}
+      {% set kunci = (not pengguna) and (b.urutan > batas_bab) %}
+      {% set sudah = b.urutan in sudah %}
+      <a class="bab-item{% if kunci %} bab-terkunci{% endif %}{% if sudah %} bab-sudah{% endif %}" href="/novel/{{ n.slug }}/bab/{{ b.urutan }}">
+        <span class="bab-kiri">
+          <span class="bab-no">{% if sudah %}<span class="bab-cek" title="Sudah dibaca" aria-label="Sudah dibaca">✓</span>{% endif %}Bab {{ b.nomor or b.urutan }}</span>
+          <span class="bab-judul">{{ b.judul }}</span>
+        </span>
+        <span class="bab-kanan">{% if kunci %}<span class="gkunci" title="Perlu masuk untuk membaca" aria-label="Terkunci">{% include "_gembok.html" %}</span>{% else %}›{% endif %}</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  {% else %}
+  <div class="kosong"><b>Belum ada bab</b><span>Bab akan muncul setelah ditambahkan.</span></div>
+  {% endif %}
+
+</div>
+{% endblock %}

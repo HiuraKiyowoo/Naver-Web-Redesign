@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block judul %}Masuk · {{ nama }}{% endblock %}
+
+{# ⚠️ WAJIB di LUAR <title> — kalau di dalam <title> browser MENGABAIKAN skrip!
+   /fb.js HARUS dimuat SEBELUM auth-web.js supaya window.FB_KONFIG sudah terisi #}
+{% block kepala %}
+<script src="/fb.js?v={{ versi_aset() }}"></script>
+<script src="/static/auth-web.js?v={{ versi_aset() }}" defer></script>
+{% endblock %}
+
+{% block isi %}
+<div class="auth-tirai">
+  <div class="auth-kotak">
+    <a class="auth-logo" href="/">{{ nama }}</a>
+    <h1 class="auth-judul">Masuk untuk lanjut membaca</h1>
+    <p class="auth-sub">
+      Bab 1–3 <b>gratis tanpa akun</b> di tiap novel.<br>
+      Masuk supaya bisa baca <b>semua bab</b>, simpan riwayat &amp; pustaka pribadi.
+    </p>
+
+    {# ── kalau Firebase belum dikonfigurasi ── #}
+    {% if not fb_siap %}
+    <div class="auth-info">
+      <b>Masuk belum aktif.</b>
+      Kunci Firebase (<code>firebase-admin.json</code>) belum dipasang di server.
+      Sementara ini baca bebas tanpa akun sudah jalan seperti biasa.
+    </div>
+    {% endif %}
+    <div id="authGalat" class="auth-galat" hidden></div>
+
+    <div class="auth-aksi">
+      <button class="auth-google" id="btnGoogle" type="button" {% if not fb_siap %}disabled{% endif %}>
+        <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true">
+          <path fill="#4285F4" d="M45 24c0-1.6-.1-2.7-.4-4H24v7.5h12c-.2 2-1.5 5-4.4 7l-.1.3 6.4 5 .4.1C42.4 36.1 45 30.6 45 24z"/>
+          <path fill="#34A853" d="M24 46c6.9 0 12.7-2.3 16.9-6.1l-8.1-6.2c-2.1 1.5-5 2.5-8.8 2.5-6.7 0-12.4-4.4-14.4-10.5l-.1 0-6.7 5.2-.1.2C6.9 41 14.8 46 24 46z"/>
+          <path fill="#FBBC05" d="M9.6 25.7C9 23.9 8.7 22 8.7 20s.4-3.9 1-5.7l-.0-.4-6.8-5.2-.2.1C1 12.1 0 15.9 0 20s1 7.9 2.7 11.2l6.9-5.5z"/>
+          <path fill="#EB4335" d="M24 8.1c4.6 0 7.8 2 9.6 3.7l7-6.8C36.7 1.2 30.9-1 24-1 14.8-1 6.9 4 2.7 11.2l6.9 5.4C11.6 10.5 17.3 8.1 24 8.1z"/>
+        </svg>
+        Masuk dengan Google
+      </button>
+      <div class="auth-atau"><span>atau</span></div>
+    </div>
+
+    <form class="auth-form" id="formEmail" autocomplete="on">
+      <label class="auth-label" for="email">Email</label>
+      <input class="auth-input" id="email" name="email" type="email" required
+             placeholder="nama@email.com" autocomplete="email">
+
+      <label class="auth-label" for="sandi" id="labelSandi">Sandi</label>
+      <input class="auth-input" id="sandi" name="sandi" type="password" required
+             placeholder="minimal 6 huruf" autocomplete="current-password" minlength="6">
+
+      <label class="auth-label" for="sandi2" id="labelSandi2" hidden>Ulangi Sandi</label>
+      <input class="auth-input" id="sandi2" name="sandi2" type="password" hidden
+             placeholder="ulangi sandi" autocomplete="new-password" minlength="6">
+
+      <button class="auth-tombol" id="btnKirim" type="submit">Masuk</button>
+    </form>
+
+    <div class="auth-ali">
+      <span id="teksAli">Belum punya akun?</span>
+      <a href="#" id="linkAli">Daftar</a>
+    </div>
+    <div class="auth-ali">
+      <a href="#" id="linkLupa">Lupa sandi?</a>
+    </div>
+
+    <a class="auth-lewat" href="/">Lewati dulu — baca 3 bab gratis</a>
+  </div>
+</div>
+
+{# config Firebase sudah dimuat di blok judul (sebelum auth-web.js) #}
+{% endblock %}

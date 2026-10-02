@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block judul %}Cari{% if q %}: {{ q }}{% endif %} · {{ nama }}{% endblock %}
+
+{% block isi %}
+<div class="wadah" style="padding-top:96px">
+
+  <div class="judul-hal">
+    <div>
+      <h1>{% if q %}Hasil untuk “{{ q }}”{% else %}Cari{% endif %}</h1>
+      <p>{% if q %}{{ total }} novel · {{ bab_hits|length }} bab cocok{% else %}Ketik judul, penulis, atau isi bab{% endif %}</p>
+    </div>
+  </div>
+
+  {# ── kotak cari (sama seperti di Jelajah) ── #}
+  <form class="cari-besar" action="/cari" method="get" role="search">
+    <span class="ikon" aria-hidden="true">⌕</span>
+    <input type="search" name="q" placeholder="Cari novel, penulis, atau isi bab"
+           value="{{ q|default('') }}" aria-label="Cari novel" autocomplete="off">
+    <button type="submit">Cari</button>
+  </form>
+
+  {% if not q %}
+  <div class="kosong">
+    <b>Mulai mencari</b>
+    <span>Gunakan kotak cari di atas.</span>
+  </div>
+  {% else %}
+
+    {% if hasil %}
+    <div class="grid">
+      {% for n in hasil %}{% include "_kartu.html" %}{% endfor %}
+    </div>
+    {% endif %}
+
+    {% if bab_hits %}
+    <section class="bagian" style="margin-top:40px">
+      <div class="bagian-kepala">
+        <div class="bagian-kiri"><h2>Bab yang Cocok</h2><span class="bagian-sub">Dari dalam isi bab</span></div>
+      </div>
+      <div class="panel">
+        <div class="bab-daftar">
+          {% for b in bab_hits %}
+          <a class="bab-item" href="/novel/{{ b.slug }}/bab/{{ b.urutan }}">
+            <span class="bab-kiri">
+              <span class="bab-no">{{ b.judul }}</span>
+              <span class="bab-judul">{{ b.novel_judul }}</span>
+            </span>
+            <span class="bab-kanan">›</span>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if not hasil and not bab_hits %}
+    <div class="kosong">
+      <b>Tidak ditemukan</b>
+      <span>Coba kata kunci lain atau periksa ejaan.</span>
+    </div>
+    {% endif %}
+
+    {% set dasar_url = '/cari?q=' ~ q %}
+    {% include "_halaman.html" %}
+  {% endif %}
+</div>
+{% endblock %}

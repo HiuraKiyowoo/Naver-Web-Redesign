@@ -1,0 +1,19 @@
+{# Kartu BER-NOMOR untuk daftar 2 kolom (dipakai section Update Terbaru).
+   Butuh: n (novel), no (nomor urut). ⚠️ CSS .rak2 WAJIB 2 kolom di semua ukuran. #}
+<a class="kartu" href="{{ n.url }}">
+  <span class="no">{{ n.no }}</span>
+  <div class="kartu-cover{% if not n.cover %} skeleton{% endif %}">
+    {% if n.cover %}
+      <img src="{{ n.cover }}" alt="Cover {{ n.judul }}" loading="lazy">
+    {% else %}
+      <div class="tanpa-cover">{{ n.judul[:1] }}</div>
+    {% endif %}
+  </div>
+  <div style="flex:1;min-width:0">
+    <h3 class="kartu-judul">{{ n.judul }}</h3>
+    <span class="kartu-meta">
+      {%- if n.tanggal %}Update {{ n.tanggal }}{% endif -%}
+      {%- if n.c_bab %} · {{ n.c_bab }} bab{% endif -%}
+    </span>
+  </div>
+</a>

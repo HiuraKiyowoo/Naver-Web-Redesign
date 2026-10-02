@@ -1,0 +1,7 @@
+# jangan pernah masuk repo
+rahasia/
+*.env
+users.db
+users.db-wal
+users.db-shm
+__pycache__/

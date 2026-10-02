@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block judul %}{{ judul }}{% endblock %}
+
+{% block isi %}
+<div class="wadah">
+  <div class="kepala-halaman">
+    <h1>Pustaka</h1>
+    <span>Koleksi pribadi &amp; riwayat baca</span>
+  </div>
+
+  {% if pengguna %}
+
+  {# ══ FAVORIT ══ #}
+  <section class="bagian">
+    <div class="bagian-kepala">
+      <div class="bagian-kiri"><h2>Favorit</h2>
+        <span class="bagian-sub">{{ fav|length }} novel disimpan</span></div>
+    </div>
+    {% if fav %}
+    <div class="grid">
+      {% for m in fav %}{% set n = m %}{% include "_kartu.html" %}{% endfor %}
+    </div>
+    {% else %}
+    <div class="kosong">
+      <b>Belum ada favorit</b>
+      <span>Tekan tombol ♥ di halaman novel untuk menyimpannya di sini.</span>
+    </div>
+    {% endif %}
+  </section>
+
+  {# ══ RIWAYAT BACA ══ #}
+  <section class="bagian">
+    <div class="bagian-kepala">
+      <div class="bagian-kiri"><h2>Riwayat Baca</h2>
+        <span class="bagian-sub">{{ riwayat|length }} novel terakhir</span></div>
+    </div>
+    {% if riwayat %}
+    <div class="pustaka-daftar">
+      {% for m in riwayat %}
+      <a class="pustaka-baris" href="/novel/{{ m.slug }}/bab/{{ m.bab_terakhir }}">
+        {% if m.cover %}
+        <img src="{{ m.cover }}" alt="" loading="lazy">
+        {% else %}<span class="pustaka-kosong"></span>{% endif %}
+        <span class="pustaka-teks">
+          <b>{{ m.judul }}</b>
+          <span>Bab terakhir dibaca: {{ m.bab_terakhir }}</span>
+        </span>
+        <span class="pustaka-lanjut">Lanjut →</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="kosong">
+      <b>Belum ada riwayat</b>
+      <span>Novel yang kamu baca akan muncul di sini.</span>
+    </div>
+    {% endif %}
+  </section>
+
+  {% else %}
+
+  {# ══ BELUM MASUK ══ #}
+  <div class="akun-kartu akun-kartu-tamu">
+    <span class="akun-foto akun-foto-abu">▤</span>
+    <div class="akun-teks">
+      <b>Pustaka masih kosong</b>
+      <span>Masuk untuk menyimpan favorit, riwayat baca, dan posisi bab terakhirmu.</span>
+    </div>
+  </div>
+  <div class="akun-aksi">
+    <a class="tombol tombol-utama" href="/masuk">Masuk / Daftar</a>
+    <a class="tombol tombol-abu" href="/jelajah">Jelajah dulu</a>
+  </div>
+
+  {% endif %}
+</div>
+{% endblock %}
