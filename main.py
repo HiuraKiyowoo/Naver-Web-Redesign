@@ -101,8 +101,10 @@ async def _rate_limit(request: Request, call_next):
         print(f"[HONEYPOT] {ip} menyentuh {jalur} -> blokir 24 jam", flush=True)
         return HTMLResponse("<h1>403</h1>", status_code=403)
 
+    # ⚠️ 2 Okt: batas dilonggarkan (240/10 -> 600/60). Halaman DETAIL
+    #    /novel/<slug> TIDAK dihitung 'bab' lagi (hanya /bab/).
     kena, sisa, sebab = rate_limit.periksa(
-        request, jalur, batas_umum=240, batas_bab=10)
+        request, jalur, batas_umum=600, batas_bab=60)
     if kena:
         _RAPORT[rate_limit.ip_asli(request)] = sebab
         return HTMLResponse(
