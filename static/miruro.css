@@ -1087,7 +1087,7 @@ a.hal-angka-item:hover{ background:rgba(4,157,253,.16); color:#DFF0FF; }
 .panel-judul{margin:0 0 14px;font-size:17px;font-weight:650;letter-spacing:-.01em;
   color:var(--teks,#e8eef5);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .panel-jam{font-size:12px;font-weight:400;color:var(--teks-lemah,#8b9bb0)}
-.panel-grid,.panel-angka{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.panel-grid,.panel-angka{display:grid;gap:12px;grid-template-columns:repeat(4,minmax(0,1fr))}
 .panel-kartu,.panel-kotak{padding:16px 14px;border-radius:14px;background:var(--kartu,#0f1a24);
   border:1px solid var(--garis,#1d2a36);display:flex;flex-direction:column;gap:5px}
 .panel-kartu b,.panel-kotak b{font-size:19px;font-weight:680;letter-spacing:-.02em;color:#e8eef5}
