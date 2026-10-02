@@ -188,7 +188,7 @@ img { display: block; }
 .hero-item {
   flex: 0 0 90%; max-width: 860px; scroll-snap-align: center;
   aspect-ratio: 16/9; position: relative; overflow: hidden; background: var(--panel2);
-  border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.5);
+  border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,.5);
   transition: transform .4s cubic-bezier(.25,1,.5,1), opacity .4s;
   transform: scale(.88); opacity: .45; z-index: 1;
 }
@@ -204,8 +204,9 @@ img { display: block; }
   height: 70%; width: auto; aspect-ratio: 2/3; object-fit: cover; border-radius: 6px;
   margin-left: clamp(16px, 5%, 38px); box-shadow: 4px 8px 20px rgba(0,0,0,.65);
 }
-.hero-bawah { position: absolute; left: clamp(16px, 5%, 38px); bottom: 8%;
-  display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.hero-bawah { position: absolute; right: clamp(16px, 5%, 38px); left: auto; bottom: 8%;
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-end;
+  max-width: 46%; }
 .hero-pil { background: var(--oranye); color: #fff; font-size: clamp(8px,1.4vw,11px);
   font-weight: 900; padding: 5px 12px; border-radius: 999px; }
 .hero-btn { background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.32);

@@ -26,72 +26,117 @@ function bacaBalasan(r) {
 
   'use strict';
 
-  /* ── 1. HERO CAROUSEL: kartu tengah membesar, samping mengecil ── */
+  'use strict';
+
+  /* ── 1. HERO CAROUSEL (INFINITE / MULUS) ─────────────────────
+     Clone di awal & akhir supaya loop tidak "patah" di ujung.
+     Alur: ... N, cloneAkhir(=1) -> animasi ke cloneAkhir -> lompat diam
+     ke item 1 asli. Sebaliknya untuk arah mundur.
+     ─────────────────────────────────────────────────────────── */
   var track = document.getElementById('heroTrack');
   var titik = document.getElementById('heroTitik');
   if (track) {
-    var item = Array.prototype.slice.call(track.querySelectorAll('.hero-item'));
-    var noktah = titik ? Array.prototype.slice.call(titik.querySelectorAll('span')) : [];
-    var sekarang = 0;
-    var diam = null;
+    var asli = Array.prototype.slice.call(track.querySelectorAll('.hero-item'));
+    var N = asli.length;
 
-    function tandai(i) {
-      sekarang = (i + item.length) % item.length;
-      item.forEach(function (el, k) { el.classList.toggle('aktif', k === sekarang); });
-      noktah.forEach(function (el, k) { el.classList.toggle('on', k === sekarang); });
-    }
+    if (N > 1) {
+      var cloneAkhir = asli[0].cloneNode(true);
+      var cloneAwal = asli[N - 1].cloneNode(true);
+      cloneAkhir.classList.remove('aktif');
+      cloneAwal.classList.remove('aktif');
+      cloneAkhir.setAttribute('aria-hidden', 'true');
+      cloneAwal.setAttribute('aria-hidden', 'true');
+      track.appendChild(cloneAkhir);
+      track.insertBefore(cloneAwal, track.firstChild);
 
-    /* Geser ke kartu ke-i dengan menempatkannya di tengah layar. */
-    function ke(i) {
-      var k = (i + item.length) % item.length;
-      var el = item[k];
-      if (!el) return;
-      var kiri = el.offsetLeft - (track.clientWidth - el.offsetWidth) / 2;
-      track.scrollTo({ left: Math.max(0, kiri), behavior: 'smooth' });
-      tandai(k);
-      mulaiDiam();
-    }
+      var semua = Array.prototype.slice.call(track.querySelectorAll('.hero-item'));
+      var noktah = titik ? Array.prototype.slice.call(titik.querySelectorAll('span')) : [];
+      var pos = 1;          // 1..N = item asli; 0 = cloneAwal; N+1 = cloneAkhir
+      var diam = null;
+      var lompat = false;
 
-    /* Saat pengguna menggeser sendiri: tandai kartu terdekat ke tengah. */
-    function dariGulir() {
-      var tengah = track.scrollLeft + track.clientWidth / 2;
-      var dekat = 0, jarak = Infinity;
-      item.forEach(function (el, k) {
-        var p = el.offsetLeft + el.offsetWidth / 2;
-        var d = Math.abs(p - tengah);
-        if (d < jarak) { jarak = d; dekat = k; }
+      function tandaiAktif() {
+        semua.forEach(function (el, k) { el.classList.toggle('aktif', k === pos); });
+        var n = ((pos - 1) % N + N) % N;
+        noktah.forEach(function (el, k) { el.classList.toggle('on', k === n); });
+      }
+
+      function tengahkan(instan) {
+        var el = semua[pos];
+        if (!el) return;
+        var kiri = el.offsetLeft - (track.clientWidth - el.offsetWidth) / 2;
+        if (instan) {
+          var lama = track.style.scrollBehavior;
+          track.style.scrollBehavior = 'auto';
+          track.scrollLeft = Math.max(0, kiri);
+          track.style.scrollBehavior = lama || '';
+        } else {
+          track.scrollTo({ left: Math.max(0, kiri), behavior: 'smooth' });
+        }
+        tandaiAktif();
+      }
+
+      // Lompat TANPA animasi ke padanan asli bila sedang di clone.
+      function normalkan() {
+        if (pos === 0) { lompat = true; pos = N; tengahkan(true); lompat = false; }
+        else if (pos === N + 1) { lompat = true; pos = 1; tengahkan(true); lompat = false; }
+      }
+
+      function maju() {
+        pos = pos + 1;
+        tengahkan(false);
+        mulaiDiam();
+      }
+      function mundur() {
+        pos = pos - 1;
+        tengahkan(false);
+        mulaiDiam();
+      }
+
+      // setelah animasi geser selesai, normalkan posisi clone
+      track.addEventListener('scroll', function () {
+        if (lompat) return;
+        window.clearTimeout(track._t);
+        track._t = setTimeout(function () {
+          // kalau diam di clone -> lompat ke aslinya
+          if (pos === 0 || pos === N + 1) { normalkan(); return; }
+          // pengguna menggeser manual: cari kartu terdekat
+          var tengah = track.scrollLeft + track.clientWidth / 2;
+          var dekat = pos, jarak = Infinity;
+          semua.forEach(function (el, k) {
+            var p = el.offsetLeft + el.offsetWidth / 2;
+            var d = Math.abs(p - tengah);
+            if (d < jarak) { jarak = d; dekat = k; }
+          });
+          if (dekat !== pos) { pos = dekat; tandaiAktif(); }
+        }, 120);
+      }, { passive: true });
+
+      function mulaiDiam() {
+        clearTimeout(diam);
+        diam = setTimeout(maju, 6000);
+      }
+
+      ['pointerdown', 'touchstart', 'wheel'].forEach(function (ev) {
+        track.addEventListener(ev, function () { clearTimeout(diam); }, { passive: true });
       });
-      if (dekat !== sekarang) tandai(dekat);
+      track.addEventListener('touchend', mulaiDiam, { passive: true });
+
+      noktah.forEach(function (el, k) {
+        el.addEventListener('click', function () {
+          lompat = true; pos = k + 1; tengahkan(false); lompat = false; mulaiDiam();
+        });
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft') mundur();
+        if (e.key === 'ArrowRight') maju();
+      });
+
+      requestAnimationFrame(function () { lompat = true; pos = 1; tengahkan(true); lompat = false; mulaiDiam(); });
+    } else if (N === 1) {
+      asli[0].classList.add('aktif');
     }
-
-    /* Rotasi otomatis tiap 6 dtk, berhenti sebentar setelah disentuh. */
-    function mulaiDiam() {
-      clearTimeout(diam);
-      diam = setTimeout(function () { ke(sekarang + 1); }, 6000);
-    }
-
-    track.addEventListener('scroll', function () {
-      window.clearTimeout(track._t);
-      track._t = setTimeout(dariGulir, 90);
-    }, { passive: true });
-
-    ['pointerdown', 'touchstart', 'wheel'].forEach(function (ev) {
-      track.addEventListener(ev, function () { clearTimeout(diam); }, { passive: true });
-    });
-    track.addEventListener('touchend', mulaiDiam, { passive: true });
-
-    noktah.forEach(function (el, k) {
-      el.addEventListener('click', function () { ke(k); });
-    });
-
-    /* Panah kiri/kanan papan ketik */
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowLeft') ke(sekarang - 1);
-      if (e.key === 'ArrowRight') ke(sekarang + 1);
-    });
-
-    /* Mulai di kartu pertama (posisi tengah) */
-    requestAnimationFrame(function () { ke(0); });
   }
 
   /* ── 2. TOMBOL PANAH RAK: geser rak ke kiri/kanan ── */
