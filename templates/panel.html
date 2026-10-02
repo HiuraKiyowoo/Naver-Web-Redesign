@@ -38,12 +38,6 @@
     </div>
   </section>
 
-  {# ── 4) SUMBER NOVEL ── #}
-  <section class="panel-bagian">
-    <h2 class="panel-judul">Asal Sumber Novel</h2>
-    <div class="panel-tabel" id="panelSumber"><span class="panel-muat">memuat…</span></div>
-  </section>
-
   {# ── 5) NOVEL TERBARU MASUK ── #}
   <section class="panel-bagian">
     <h2 class="panel-judul">Novel Terbaru Masuk</h2>
@@ -151,9 +145,6 @@
           [angka(pg.baca), 'Riwayat baca'],
           [angka(pg.request), 'Request masuk'],
         ]);
-
-        tabel(el('panelSumber'), d.sumber || [], ['Sumber', 'Jumlah'],
-          function (r) { return [aman(r.s), angka(r.c)]; });
 
         tabel(el('panelTerbaru'), d.terbaru || [], ['ID', 'Judul', 'Bab'],
           function (r) {
