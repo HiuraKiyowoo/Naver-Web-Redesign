@@ -1087,8 +1087,7 @@ a.hal-angka-item:hover{ background:rgba(4,157,253,.16); color:#DFF0FF; }
 .panel-judul{margin:0 0 14px;font-size:17px;font-weight:650;letter-spacing:-.01em;
   color:var(--teks,#e8eef5);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .panel-jam{font-size:12px;font-weight:400;color:var(--teks-lemah,#8b9bb0)}
-.panel-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
-.panel-angka{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(128px,1fr))}
+.panel-grid,.panel-angka{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
 .panel-kartu,.panel-kotak{padding:16px 14px;border-radius:14px;background:var(--kartu,#0f1a24);
   border:1px solid var(--garis,#1d2a36);display:flex;flex-direction:column;gap:5px}
 .panel-kartu b,.panel-kotak b{font-size:19px;font-weight:680;letter-spacing:-.02em;color:#e8eef5}
@@ -1318,12 +1317,11 @@ a.hal-angka-item:hover{ background:rgba(4,157,253,.16); color:#DFF0FF; }
 @media(max-width:700px){
   .admin-halaman{ display:block; padding-top:30px; }
   .admin-halaman > .panel-bagian{ margin:25px 0; }
-  .admin-halaman .panel-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .admin-halaman .panel-angka{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .admin-halaman .panel-grid,.admin-halaman .panel-angka{ grid-template-columns:repeat(2,minmax(0,1fr)); }
   .admin-halaman .panel-bagian:nth-of-type(4),.admin-halaman .panel-bagian:nth-of-type(5){ margin-top:25px; }
 }
 @media(max-width:430px){
-  .admin-halaman .panel-grid{ grid-template-columns:1fr 1fr; gap:6px; }
+  .admin-halaman .panel-grid,.admin-halaman .panel-angka{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
   .admin-halaman .panel-kartu,.admin-halaman .panel-kotak{ padding:12px 10px; }
   .admin-halaman .panel-kotak b{ font-size:19px; }
   .admin-halaman .panel-tbl{ min-width:520px; }
@@ -1331,9 +1329,8 @@ a.hal-angka-item:hover{ background:rgba(4,157,253,.16); color:#DFF0FF; }
 
 
 /* Admin: statistik Arsip selalu punya kolom konsisten — tidak ada card yang melebar sendiri. */
-.admin-halaman > .panel-bagian:nth-of-type(2) .panel-angka{ grid-template-columns:repeat(4,minmax(0,1fr)); }
+.admin-halaman .panel-angka .panel-kotak{ min-width:0; }
 @media(max-width:700px){
-  .admin-halaman > .panel-bagian:nth-of-type(2) .panel-angka{ grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
 
 
